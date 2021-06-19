@@ -7,13 +7,16 @@ import matplotlib.pyplot as plt
 import dataframe_image
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
+import sys
 
 class price:
     
     def __init__(self):
 ############################################################################################        
+        
         self.root = tkinter.Tk()
-        self.root.geometry('600x500')
+        self.root.geometry('900x400')
+        '''
         self.gold = IntVar()
         self.dollar = IntVar()
         self.bitcoin = IntVar()
@@ -24,23 +27,35 @@ class price:
         self.tether = IntVar()
         self.iqd = IntVar()
         self.shasta = IntVar()
-#############################################################################################
-        Checkbutton(self.root,text='دلار', variable=self.dollar).grid(column=0, row=1)
-        Checkbutton(self.root, text='طلا', variable= self.gold).grid(column=1, row= 1)
-        Checkbutton(self.root,text='بیتکوین', variable=self.bitcoin).grid(column=0, row=2)
-        Checkbutton(self.root,text='سکه تمام', variable=self.gold_coin).grid(column=1, row=2)
-        Checkbutton(self.root,text='یورو', variable=self.euro).grid(column=0, row=5)
-        Checkbutton(self.root,text='بورس', variable=self.bors).grid(column=0, row=5)
-        Checkbutton(self.root,text='درهم امارات', variable=self.derham).grid(column=0, row=6)
-        Checkbutton(self.root,text='تتر', variable=self.tether).grid(column=0, row=7)
-        Checkbutton(self.root,text='دینار عراق', variable=self.iqd).grid(column=0, row=8)
-        Checkbutton(self.root,text='شستا', variable=self.shasta).grid(column=0, row=9)
-##############################################################################################
-        b = Button(self.root, text= 'show price', command= self.show).grid(column=1, row=1)
-        self.root.mainloop()
+        '''
+        self.root.iconbitmap('C:/Users/ali/Desktop/Graphicloads-Colorful-Long-Shadow-Dollar.ico')
+        self.l = IntVar()
         
+#############################################################################################
+        frame = LabelFrame(self.root, text = 'select one of the checkboxes',bd=3,padx=20,pady=10)
+        frame.place(x=20, y = 40)
+        Radiobutton(frame,text='دلار', variable=self.l,value= 'dollar', command=self.dollar_price).pack()
+        Radiobutton(frame, text='طلا', variable= self.l,value = 'gold', command = self.gold_price).pack()
+        Radiobutton(frame,text='بیتکوین', variable=self.l, value='bitcoin', command=self.bitcoin_price).pack()
+        Radiobutton(frame,text='سکه تمام', variable=self.l, value='coin',command = self.coin_gold_price).pack()
+        Radiobutton(frame,text='یورو', variable=self.l, value='euro', command =self.euro_price).pack()
+        Radiobutton(frame,text='بورس', variable=self.l, value = 'bors', command=self.bors_price).pack()
+        Radiobutton(frame,text='درهم امارات', variable=self.l, value = 'derham', command = self.derham_price).pack()
+        Radiobutton(frame,text='تتر', variable=self.l, value='tether', command=self.tether_price).pack()
+        Radiobutton(frame,text='دینار عراق', variable=self.l, value = 'divar', command=self.iqd_price).pack()
+        Radiobutton(frame,text='شستا', variable=self.l,value='shasta',command=self.shasta_price).pack()
+        #Label(self.root, text = '               ').grid(column=1,row=0)
+        
+##############################################################################################
+        exit_page_1 = Button(self.root, text= 'Exit', command= self.root.destroy, width=20, bd =3).place(x = 30, y =350)
+
+        self.root.title("Have the newest price")
+        self.root.mainloop()
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        
+ 
+    """
     def show(self):
-        if self.gold.get():
+        if self.l.get() == 'dollar':
             self.gold_price()
         elif self.dollar.get():
             self.dollar_price()
@@ -61,9 +76,11 @@ class price:
         elif self.shasta.get():
             self.shasta_price()
             
+            """
+            
     def gold_price(self):
-        site = requests.get("https://www.tgju.org/profile/geram18")
-        soup = BeautifulSoup(site.text, 'html.parser')
+        self.gold_price_site = requests.get("https://www.tgju.org/profile/geram18")
+        soup = BeautifulSoup(self.gold_price_site.text, 'html.parser')
         data = soup.select('#main > div.stocks-profile > div.fs-row.bootstrap-fix.widgets.full-w-set > div > div.tgju-widgets-block.col-12.col-md-6.mobile-hide > div:nth-child(1) > div.tables-default.normal > table > tbody > tr ')
       #  print(len(data))
         dates = []
@@ -88,12 +105,12 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\gold.png', dpi=100 )
+        plt.savefig('data\\gold.png', dpi=90 )
         image1 = Image.open(r"data\gold.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=6, row=6)
+        label1.place( x=350, y=25)
         plt.close()
         
         
@@ -118,12 +135,12 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\dollar.png', dpi=100 )
+        plt.savefig('data\\dollar.png', dpi=90 )
         image1 = Image.open(r"data\dollar.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=6, row=6)
+        label1.place( x=350, y=25)
         plt.close()
     def bitcoin_price(self):
         site = requests.get('https://www.tgju.org/profile/crypto-bitcoin')
@@ -146,12 +163,12 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\bitcoin.png', dpi=100 )
+        plt.savefig('data\\bitcoin.png', dpi=90 )
         image1 = Image.open(r"data\bitcoin.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=6, row=6)
+        label1.place( x=350, y=25)
         plt.close()
         
     def coin_gold_price(self):
@@ -175,12 +192,12 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\coin.png', dpi=100 )
+        plt.savefig('data\\coin.png', dpi=90 )
         image1 = Image.open(r"data\coin.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=6, row=6)
+        label1.place( x=350, y=25)
         plt.close()        
         
     def euro_price(self):
@@ -209,7 +226,7 @@ class price:
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=6, row=6)
+        label1.place( x=350, y=25)
         plt.close() 
         
     def bors_price(self):
@@ -238,7 +255,7 @@ class price:
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=7, row=1)
+        label1.place( x=350, y=25)
         plt.close()         
         
     def derham_price(self):
@@ -267,7 +284,7 @@ class price:
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=7, row=1)
+        label1.place( x=350, y=25)
         plt.close() 
         
     def tether_price(self):
@@ -296,7 +313,7 @@ class price:
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=7, row=1)
+        label1.place( x=350, y=25)
         plt.close() 
         
     def iqd_price(self):
@@ -324,7 +341,7 @@ class price:
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=7, row=1)
+        label1.place( x=350, y=25)
         plt.close()         
         
     def shasta_price(self):
@@ -351,13 +368,12 @@ class price:
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.root, image=test)
         label1.image = test
-        label1.grid(column=7, row=1)
+        label1.place( x=350, y=25)
         plt.close()                
         
     
         
 c = price()
-
 
 
 
