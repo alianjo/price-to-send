@@ -2,12 +2,19 @@ from bs4 import BeautifulSoup
 import requests
 import tkinter
 from tkinter import *
+from tkinter import ttk
 from  pandas import DataFrame
 import matplotlib.pyplot as plt
 import dataframe_image
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
-import sys
+from tkinter import filedialog
+import time
+import smtplib, ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import threading
+
 
 class price:
     
@@ -15,24 +22,30 @@ class price:
 ############################################################################################        
         
         self.root = tkinter.Tk()
-        self.root.geometry('900x400')
-        '''
-        self.gold = IntVar()
-        self.dollar = IntVar()
-        self.bitcoin = IntVar()
-        self.gold_coin = IntVar()
-        self.euro = IntVar()
-        self.bors = IntVar()
-        self.derham = IntVar()
-        self.tether = IntVar()
-        self.iqd = IntVar()
-        self.shasta = IntVar()
-        '''
+        self.root.geometry('900x500')
+
+
         self.root.iconbitmap('C:/Users/ali/Desktop/Graphicloads-Colorful-Long-Shadow-Dollar.ico')
         self.l = IntVar()
+        menu_bar = Menu(self.root)
+        menu_bar2 = Menu(menu_bar, tearoff=0)
+        menu_bar2.add_command(label='Exit', command=self.root.destroy)
+        menu_bar.add_cascade(label='Option', menu=menu_bar2)
+        self.root.config(menu=menu_bar)     
+###############################################/////  add Tabs   ###################################
+        tabs = ttk.Notebook(self.root)            
+        self.first = ttk.Frame(tabs)
+        tabs.add(self.first, text='نمودار و قیمت')
+        self.second = ttk.Frame(tabs)
+        tabs.add(self.second, text='ارسال به دوستان')
+        tabs.pack(expand=1, fill="both")
+
         
+
+        
+
 #############################################################################################
-        frame = LabelFrame(self.root, text = 'select one of the checkboxes',bd=3,padx=20,pady=10)
+        frame = LabelFrame(self.first, text = 'select one of the checkboxes',bd=3,padx=20,pady=10)
         frame.place(x=20, y = 40)
         Radiobutton(frame,text='دلار', variable=self.l,value= 'dollar', command=self.dollar_price).pack()
         Radiobutton(frame, text='طلا', variable= self.l,value = 'gold', command = self.gold_price).pack()
@@ -44,39 +57,153 @@ class price:
         Radiobutton(frame,text='تتر', variable=self.l, value='tether', command=self.tether_price).pack()
         Radiobutton(frame,text='دینار عراق', variable=self.l, value = 'divar', command=self.iqd_price).pack()
         Radiobutton(frame,text='شستا', variable=self.l,value='shasta',command=self.shasta_price).pack()
-        #Label(self.root, text = '               ').grid(column=1,row=0)
+#################################### Second page#################
+#        Int vars
+        self.dollar = IntVar()
+        self.gold = IntVar()
+        self.bitcoin = IntVar()
+        self.coin = IntVar()
+        self.euro = IntVar()
+        self.bors = IntVar()
+        self.derham = IntVar()
+        self.tether = IntVar()
+        self.iraq = IntVar()
+        self.shasta = IntVar()
+#           Entries
+        frame2 = LabelFrame(self.second, text='مواردی که قصد ارسال دارید', bd = 3, padx=20, pady=20)
+        frame2.place(x=20, y =40)
+        Checkbutton(frame2, text='دلار',variable=self.dollar).pack()
+        Checkbutton(frame2, text='طلا 18',variable=self.gold).pack()
+        Checkbutton(frame2, text='بیتکوین',variable=self.bitcoin).pack()
+        Checkbutton(frame2, text='سکه تمام',variable=self.coin).pack()
+        Checkbutton(frame2, text='یورو',variable=self.euro).pack()
+        Checkbutton(frame2, text='شاخص بورس',variable=self.bors).pack()
+        Checkbutton(frame2, text='درهم امارات',variable=self.derham).pack()
+        Checkbutton(frame2, text='تتر',variable=self.tether).pack()
+        Checkbutton(frame2, text='دینار عراق',variable=self.iraq).pack()
+        Checkbutton(frame2, text='شستا',variable=self.shasta).pack()
+        
+        self.frame3 = LabelFrame(self.second, text = 'ارسال ایمیل', bd = 3, padx =20, pady=50)
+        self.frame3.place(x =250, y=40)
+        self.email = StringVar()
+        la1 = Label(self.frame3, text = 'ایمیل').pack()
+        self.email_sender = Entry(self.frame3, textvariable=self.email,width=30, bd=2)
+        self.email_sender.pack()
+        la2 = Label(self.frame3, text='رمز عبور').pack()
+        self.password = StringVar()
+        self.password= Entry(self.frame3, textvariable=self.password,width=30, bd=2, show="*")
+        self.password.pack()
+        
+        self.one_or_more= IntVar()
+        Radiobutton(self.frame3,text='ارسال به یک نفر', variable=self.one_or_more,value=1,command = self.add_entry).pack()
+        Radiobutton(self.frame3,text='ارسال به چند نفر', variable=self.one_or_more,value=0,command = self.delete_and_add).pack()
+        self.button_explore = Button(self.frame3,text = "انتخاب لیست", command = self.browseFiles)
+        self.button_explore.pack()
+        label_in_frame=Label(self.frame3, text='دریافت کننده').pack()
+        self.entry_for_reciver = Entry(self.frame3,width=30, bd=2,state='readonly')
+        self.entry_for_reciver.pack()
+        button_explore = Button(self.frame3,text = "ارسال", command = self.send_email).pack()
+        self.frame4 = LabelFrame(self.second, text = 'ارسال SMS', bd = 3, padx =20, pady=50)
+        self.frame4.place(x =550, y=40)    
+        Label(self.frame4, text='فایل تسکتی که دارای شماره تماس ها است را انتخاب کنید').pack()
+        self.button_explore2 = Button(self.frame4,text = "انتخاب لیست", command = self.browseFiles)
+        self.button_explore2.pack()
+        button_explore = Button(self.frame4,text = "ارسال", command = self.send_email).pack()
+
+
         
 ##############################################################################################
-        exit_page_1 = Button(self.root, text= 'Exit', command= self.root.destroy, width=20, bd =3).place(x = 30, y =350)
+        exit_page_1 = Button(self.first, text= 'Exit', command= self.root.destroy, width=20, bd =3).place(x = 30, y =400)
 
         self.root.title("Have the newest price")
         self.root.mainloop()
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        
- 
-    """
-    def show(self):
-        if self.l.get() == 'dollar':
-            self.gold_price()
-        elif self.dollar.get():
-            self.dollar_price()
-        elif self.bitcoin.get():
-            self.bitcoin_price()
-        elif self.gold_coin.get():
-            self.coin_gold_price()
-        elif self.euro.get():
-            self.euro_price()
-        elif self.bors.get():
-            self.bors_price()
-        elif self.derham.get():
-            self.derham_price()
-        elif self.tether.get():
-            self.tether_price()
-        elif self.iqd.get():
-            self.iqd_price()
-        elif self.shasta.get():
-            self.shasta_price()
+    def add_entry(self):
+        self.entry_for_reciver.config(state='normal')
+        self.button_explore.config(state='disabled')
+
             
-            """
+
+    def delete_and_add(self):
+        self.button_explore.config(state='normal')
+        self.entry_for_reciver.config(state='readonly')
+        
+    def browseFiles(self):
+        self.filename = filedialog.askopenfilename(initialdir = "/", title = "Select text or xls file",filetypes = (("Text file","*.txt*"),("xls file","*.xls*")))
+              
+    def send_email(self):
+        if self.one_or_more.get() == 1:
+            if '@' in self.entry_for_reciver.get() and '@' in self.email_sender.get and self.password.get() !='':
+                prices = []
+                if self.gold.get():
+                    prices.append(self.gold_price())
+                if self.dollar.get():
+                    prices.append(self.dollar_price())
+                if self.bitcoin.get():
+                    prices.append(self.bitcoin_price())
+                if self.coin.get():
+                    prices.append(self.coin_gold_price())
+                if self.bors.get():
+                    prices.append(self.bors_price()) 
+                if self.euro.get():
+                    prices.append(self.euro_price())
+                if self.derham.get():
+                    prices.append(self.derham_price())
+                if self.tether.get():
+                    prices.append(self.tether_price())
+                if self.iraq.get():
+                    prices.append(self.iqd_price())
+                if self.shasta.get():
+                    prices.append(self.shasta_price()) 
+    
+                self.mailSender(self.email_sender.get(),self.entry_for_reciver.get(),self.password.get(),prices)
+                
+            else:
+                try:
+                    if self.err:
+                        pass
+                except:
+
+                    self.err = Label(self.frame3, text='complete your information correctly',fg='red')  
+                    self.err.pack()
+                    self.root.mainloop()
+        else:
+            try:
+                if  self.filename:
+                    prices = []
+                    if self.gold.get():
+                        prices.append(self.gold_price())
+                    if self.dollar.get():
+                        prices.append(self.dollar_price())
+                    if self.bitcoin.get():
+                        prices.append(self.bitcoin_price())
+                    if self.coin.get():
+                        prices.append(self.coin_gold_price())
+                    if self.bors.get():
+                        prices.append(self.bors_price()) 
+                    if self.euro.get():
+                        prices.append(self.euro_price())
+                    if self.derham.get():
+                        prices.append(self.derham_price())
+                    if self.tether.get():
+                        prices.append(self.tether_price())
+                    if self.iraq.get():
+                        prices.append(self.iqd_price())
+                    if self.shasta.get():
+                        prices.append(self.shasta_price()) 
+                    with open (self.filename,'r') as f :
+                        email = f.readline()
+                        while True:
+                            if not email:
+                                break
+                            threading.Thread(target=self.mailSender, args=(self.email_sender.get(),email,self.password.get(),prices,)).start()
+                            email = f.readline()
+            except AttributeError:
+                l = Label(self.frame3, text='No selection', fg='blue')
+                l.pack()
+            
+
+ 
             
     def gold_price(self):
         self.gold_price_site = requests.get("https://www.tgju.org/profile/geram18")
@@ -108,10 +235,11 @@ class price:
         plt.savefig('data\\gold.png', dpi=90 )
         image1 = Image.open(r"data\gold.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
         plt.close()
+        return(f'''Gold price at : {dates[0]} is : {prices[0]} (Rial) ''')
         
         
     def dollar_price(self):
@@ -138,10 +266,11 @@ class price:
         plt.savefig('data\\dollar.png', dpi=90 )
         image1 = Image.open(r"data\dollar.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
         plt.close()
+        return(f'''Dollor price at : {dates[0]} is : {prices[0]} (Rial) ''')
     def bitcoin_price(self):
         site = requests.get('https://www.tgju.org/profile/crypto-bitcoin')
         soup = BeautifulSoup(site.text, 'html.parser')
@@ -166,10 +295,11 @@ class price:
         plt.savefig('data\\bitcoin.png', dpi=90 )
         image1 = Image.open(r"data\bitcoin.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
         plt.close()
+        return(f'''Bitcoin price at : {dates[0]} is : {prices[0]} (Dollar) ''')
         
     def coin_gold_price(self):
         site = requests.get('https://www.tgju.org/profile/sekeb')
@@ -195,10 +325,11 @@ class price:
         plt.savefig('data\\coin.png', dpi=90 )
         image1 = Image.open(r"data\coin.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
-        plt.close()        
+        plt.close()
+        return(f'''Coin price at : {dates[0]} is : {prices[0]} (Rial) ''')        
         
     def euro_price(self):
         site = requests.get('https://www.tgju.org/profile/price_eur')
@@ -224,10 +355,11 @@ class price:
         plt.savefig('data\\euro.png', dpi=90 )
         image1 = Image.open(r"data\euro.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
-        plt.close() 
+        plt.close()
+        return(f'''Euro price at : {dates[0]} is : {prices[0]} (Rial) ''') 
         
     def bors_price(self):
         site = requests.get('https://www.tgju.org/profile/bourse')
@@ -253,10 +385,11 @@ class price:
         plt.savefig('data\\bors.png', dpi=90 )
         image1 = Image.open(r"data\bors.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
-        plt.close()         
+        plt.close()
+        return(f'''Bors index at : {dates[0]} is : {prices[0]}''')
         
     def derham_price(self):
         site = requests.get('https://www.tgju.org/profile/price_aed')
@@ -282,10 +415,11 @@ class price:
         plt.savefig('data\\derham.png', dpi=90 )
         image1 = Image.open(r"data\derham.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
-        plt.close() 
+        plt.close()
+        return(f'Derham Emirates price at : {dates[0]} is : {prices[0]} (Rial) ')
         
     def tether_price(self):
         site = requests.get('https://www.tgju.org/profile/crypto-tether')
@@ -311,10 +445,11 @@ class price:
         plt.savefig('data\\tether.png', dpi=90 )
         image1 = Image.open(r"data\tether.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
         plt.close() 
+        return(f'''Tether price at : {dates[0]} is : {prices[0]} (Rial) ''')
         
     def iqd_price(self):
         site = requests.get('https://www.tgju.org/profile/price_iqd')
@@ -339,10 +474,11 @@ class price:
         plt.savefig('data\\iqd.png', dpi=90 )
         image1 = Image.open(r"data\iqd.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
-        plt.close()         
+        plt.close()
+        return(f'Iraq Dinar price at : {dates[0]} is : {prices[0]} (Rial) ')         
         
     def shasta_price(self):
         site = requests.get('https://www.shakhesban.com/markets/stock/%D8%B4%D8%B3%D8%AA%D8%A7')
@@ -366,11 +502,46 @@ class price:
         plt.savefig('data\\shasta.png', dpi=90 )
         image1 = Image.open(r"data\shasta.png")
         test = ImageTk.PhotoImage(image1)
-        label1 = tkinter.Label(self.root, image=test)
+        label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=350, y=25)
-        plt.close()                
+        plt.close()
+        return(f'shasta price at  : {dates[0]} is : {prices[0]} (Rial)')                
+    def mailSender(self,mail_sender, mail_reciver,password_sender,prices):
         
+        if 'gmail' in mail_reciver:
+            smtp_server = "smtp.gmail.com"
+        elif 'yahoo' in mail_sender:
+            smtp_server = 	"smtp.mail.yahoo.com"
+        
+        port = 587  
+
+        # Create a secure SSL context
+        context = ssl.create_default_context()
+        
+        prices = ''.join(str(i) + '\n' for i in prices)
+        
+        message = MIMEMultipart()
+        message["From"] = mail_sender
+        message["To"] = mail_reciver
+        message["Subject"] = 'Daily prices'
+        message["Bcc"] = mail_reciver
+        message.attach(MIMEText(prices, "plain"))
+
+        
+        try:
+            server = smtplib.SMTP(smtp_server,port)
+            server.ehlo() # Can be omitted
+            server.starttls(context=context) # Secure the connection
+            server.ehlo() # Can be omitted
+            server.login(mail_sender, password=password_sender)
+            server.sendmail(mail_sender,mail_reciver, msg=message.as_string())
+            # TODO: Send email here
+        except Exception as e:
+            # Print any error messages to stdout
+            print(e)
+        finally:
+            server.quit() 
     
         
 c = price()
