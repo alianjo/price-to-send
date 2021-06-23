@@ -14,7 +14,7 @@ import smtplib, ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import threading
-
+import http.client
 
 class price:
     
@@ -108,15 +108,58 @@ class price:
         Label(self.frame4, text='فایل تسکتی که دارای شماره تماس ها است را انتخاب کنید').pack()
         self.button_explore2 = Button(self.frame4,text = "انتخاب لیست", command = self.browseFiles)
         self.button_explore2.pack()
-        button_explore = Button(self.frame4,text = "ارسال", command = self.send_email).pack()
+        button_explore = Button(self.frame4,text = "ارسال", command = self.send_with_phone).pack()
 
-
-        
 ##############################################################################################
         exit_page_1 = Button(self.first, text= 'Exit', command= self.root.destroy, width=20, bd =3).place(x = 30, y =400)
 
         self.root.title("Have the newest price")
         self.root.mainloop()
+        
+
+    def send_with_phone(self):
+        prices = []
+        if self.gold.get():
+            prices.append(self.gold_price())
+        if self.dollar.get():
+            prices.append(self.dollar_price())
+        if self.bitcoin.get():
+            prices.append(self.bitcoin_price())
+        if self.coin.get():
+            prices.append(self.coin_gold_price())
+        if self.bors.get():
+            prices.append(self.bors_price()) 
+        if self.euro.get():
+            prices.append(self.euro_price())
+        if self.derham.get():
+            prices.append(self.derham_price())
+        if self.tether.get():
+            prices.append(self.tether_price())
+        if self.iraq.get():
+            prices.append(self.iqd_price())
+        if self.shasta.get():
+            prices.append(self.shasta_price())
+            prices = ''.join(str(i) + '\n' for i in prices)
+        with open(self.filename,'r') as f:
+                first = f.readline()
+                while True:
+                    if first :
+                        threading.Thread(target=self.send_message_with_ghasedak, args=(first.split('\n')[0],prices,)).start()
+                        first= f.readline()
+                    else: break
+                
+                
+    def send_message_with_ghasedak(self,phone,msg):
+        conn = http.client.HTTPSConnection("api.ghasedak.me")
+        payload = f"message={msg}&receptor={phone}&linenumber=10008566"
+        headers = { 'content-type': "application/x-www-form-urlencoded",
+                   'apikey': "02bb8697d495c8c10257bfd8083b1990e595f4b891677cfb85dd7dca121e7623",
+                   'cache-control': "no-cache",}
+        conn.request("POST", "/v2/sms/send/simple", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        Label(self.frame4,text = data,fg='blue').pack()
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        
     def add_entry(self):
         self.entry_for_reciver.config(state='normal')
@@ -129,11 +172,11 @@ class price:
         self.entry_for_reciver.config(state='readonly')
         
     def browseFiles(self):
-        self.filename = filedialog.askopenfilename(initialdir = "/", title = "Select text or xls file",filetypes = (("Text file","*.txt*"),("xls file","*.xls*")))
+        self.filename = filedialog.askopenfilename(initialdir = "/", title = "Select text or xls file",filetypes = (("Text file","*.txt*"),))
               
     def send_email(self):
         if self.one_or_more.get() == 1:
-            if '@' in self.entry_for_reciver.get() and '@' in self.email_sender.get and self.password.get() !='':
+            if '@' in self.entry_for_reciver.get() and '@' in self.email_sender.get() and self.password.get() !='':
                 prices = []
                 if self.gold.get():
                     prices.append(self.gold_price())
