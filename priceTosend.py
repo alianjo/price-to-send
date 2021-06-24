@@ -15,6 +15,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import threading
 import http.client
+import dataframe_image as dfi # for save data frame as png file
 
 class price:
     
@@ -203,10 +204,11 @@ class price:
                 
             else:
                 try:
-                    if self.err:
-                        pass
+                    self.blue_err.destroy()
+                    self.err = Label(self.frame3, text='complete your information correctly',fg='red')
+                    self.err.pack()
+                    self.root.mainloop()
                 except:
-
                     self.err = Label(self.frame3, text='complete your information correctly',fg='red')  
                     self.err.pack()
                     self.root.mainloop()
@@ -241,9 +243,16 @@ class price:
                                 break
                             threading.Thread(target=self.mailSender, args=(self.email_sender.get(),email,self.password.get(),prices,)).start()
                             email = f.readline()
-            except AttributeError:
-                l = Label(self.frame3, text='No selection', fg='blue')
-                l.pack()
+            except Exception:
+                try:
+                    self.err.destroy()
+                    self.blue_err = Label(self.frame3, text='No selection', fg='blue')
+                    self.blue_err.pack()
+                    self.root.mainloop()
+                except Exception:
+                    self.blue_err = Label(self.frame3, text='No selection', fg='blue')
+                    self.blue_err.pack()
+                    self.root.mainloop()
             
 
  
@@ -267,20 +276,33 @@ class price:
            price_int.append(int(''.join( j for j in b)))
     
         data_frame = DataFrame({
-            'date':dates[:20:3],
-            'price':price_int[:20:3]
+            'date':dates[:10],
+            'price':prices[:10]
             }, columns=(['date', 'price']))
 
-
+        #save data frame as png
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass
+        ##################### Chart
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\gold.png', dpi=90 )
+        plt.savefig('data\\gold.png', dpi=80 )
         image1 = Image.open(r"data\gold.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\gold_dataframe.png')
+        image2 = Image.open('data\\gold_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
+        
         plt.close()
         return(f'''Gold price at : {dates[0]} is : {prices[0]} (Rial) ''')
         
@@ -302,16 +324,32 @@ class price:
         for i in prices:
             b = i.split(',')
             price_int.append(int(''.join( j for j in b)))
-        
+            
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'price':prices[:10]
+            }, columns=(['date', 'price']))
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\dollar.png', dpi=90 )
+        plt.savefig('data\\dollar.png', dpi=80 )
         image1 = Image.open(r"data\dollar.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\dollar_dataframe.png')
+        image2 = Image.open('data\\dollar_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
+        
         plt.close()
         return(f'''Dollor price at : {dates[0]} is : {prices[0]} (Rial) ''')
     def bitcoin_price(self):
@@ -331,16 +369,32 @@ class price:
         for i in prices:
             b = i.split(',')
             price_int.append(float(''.join( j for j in b)))
-          
+        
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'price':prices[:10]
+            }, columns=(['date', 'price']))
+
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass            
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\bitcoin.png', dpi=90 )
+        plt.savefig('data\\bitcoin.png', dpi=80 )
         image1 = Image.open(r"data\bitcoin.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\bitcoin_dataframe.png')
+        image2 = Image.open('data\\bitcoin_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
         plt.close()
         return(f'''Bitcoin price at : {dates[0]} is : {prices[0]} (Dollar) ''')
         
@@ -361,16 +415,30 @@ class price:
            b = i.split(',')
            price_int.append(int(''.join( j for j in b)))      
         
-        
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'price':prices[:10]
+            }, columns=(['date', 'price']))        
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass        
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\coin.png', dpi=90 )
+        plt.savefig('data\\coin.png', dpi=80 )
         image1 = Image.open(r"data\coin.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\coin_dataframe.png')
+        image2 = Image.open('data\\coin_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
         plt.close()
         return(f'''Coin price at : {dates[0]} is : {prices[0]} (Rial) ''')        
         
@@ -391,16 +459,31 @@ class price:
         for i in prices:
            b = i.split(',')
            price_int.append(int(''.join( j for j in b))) 
-     
+
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'price':prices[:10]
+            }, columns=(['date', 'price'])) 
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass        
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\euro.png', dpi=90 )
+        plt.savefig('data\\euro.png', dpi=80 )
         image1 = Image.open(r"data\euro.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\euro_dataframe.png')
+        image2 = Image.open('data\\euro_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
         plt.close()
         return(f'''Euro price at : {dates[0]} is : {prices[0]} (Rial) ''') 
         
@@ -421,16 +504,30 @@ class price:
         for i in prices:
            b = i.split(',')
            price_int.append(float(''.join( j for j in b))) 
-     
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'index':prices[:10]
+            }, columns=(['date', 'index'])) 
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass        
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\bors.png', dpi=90 )
+        plt.savefig('data\\bors.png', dpi=80 )
         image1 = Image.open(r"data\bors.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\bors_dataframe.png')
+        image2 = Image.open('data\\bors_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
         plt.close()
         return(f'''Bors index at : {dates[0]} is : {prices[0]}''')
         
@@ -451,16 +548,30 @@ class price:
         for i in prices:
            b = i.split(',')
            price_int.append(int(''.join( j for j in b)))
-     
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'price':prices[:10]
+            }, columns=(['date', 'price']))      
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\derham.png', dpi=90 )
+        plt.savefig('data\\derham.png', dpi=80 )
         image1 = Image.open(r"data\derham.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\bors_dataframe.png')
+        image2 = Image.open('data\\bors_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
         plt.close()
         return(f'Derham Emirates price at : {dates[0]} is : {prices[0]} (Rial) ')
         
@@ -481,16 +592,31 @@ class price:
         for i in prices:
            b = i.split(',')
            price_int.append(float(''.join( j for j in b)))
-     
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'price':prices[:10]
+            }, columns=(['date', 'price']))        
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\tether.png', dpi=90 )
+        plt.savefig('data\\tether.png', dpi=80 )
         image1 = Image.open(r"data\tether.png")
         test = ImageTk.PhotoImage(image1)
+        self.label2.destroy()
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\bors_dataframe.png')
+        image2 = Image.open('data\\bors_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
         plt.close() 
         return(f'''Tether price at : {dates[0]} is : {prices[0]} (Rial) ''')
         
@@ -510,16 +636,30 @@ class price:
         for i in prices:
            b = i.split(',')
            price_int.append(float(''.join( j for j in b)))
-        
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'price':prices[:10]
+            }, columns=(['date', 'price']))         
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\iqd.png', dpi=90 )
+        plt.savefig('data\\iqd.png', dpi=80 )
         image1 = Image.open(r"data\iqd.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\iqr_dataframe.png')
+        image2 = Image.open('data\\iqr_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
         plt.close()
         return(f'Iraq Dinar price at : {dates[0]} is : {prices[0]} (Rial) ')         
         
@@ -534,20 +674,34 @@ class price:
         for i in range(1,11):
             b = soup.select('#stocks-page > div > div.tabs-contents > div > div > div > div:nth-child(11) > div.tgju-widget.light.has-icon.t-mb-2.history-widget > div.tables-default.normal > table > tbody > tr:nth-child(%s) > td:nth-child(2) ' %str(i))
             prices.append( b[0].text.split()[-1])
-        
+        data_frame = DataFrame({
+            'date':dates[:10],
+            'price':prices[:10]
+            }, columns=(['date', 'price']))         
         price_int = []
         for i in prices:
             b = i.split(',')
             price_int.append(float(''.join( j for j in b)))
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\shasta.png', dpi=90 )
+        plt.savefig('data\\shasta.png', dpi=80 )
         image1 = Image.open(r"data\shasta.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
-        label1.place( x=350, y=25)
+        label1.place( x=400, y=40)
+        ######################## tabel
+        dfi.export(data_frame,'data\\shasta_dataframe.png')
+        image2 = Image.open('data\\shasta_dataframe.png')
+        test2 = ImageTk.PhotoImage(image2)
+        self.label2 = tkinter.Label(self.first,image=test2)
+        self.label2.image=test2
+        self.label2.place(x = 200,y =40)
         plt.close()
         return(f'shasta price at  : {dates[0]} is : {prices[0]} (Rial)')                
     def mailSender(self,mail_sender, mail_reciver,password_sender,prices):
