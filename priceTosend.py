@@ -16,6 +16,7 @@ from email.mime.text import MIMEText
 import threading
 import http.client
 import dataframe_image as dfi # for save data frame as png file
+from time import strftime
 
 class price:
     
@@ -36,9 +37,9 @@ class price:
 ###############################################/////  add Tabs   ###################################
         tabs = ttk.Notebook(self.root)            
         self.first = ttk.Frame(tabs)
-        tabs.add(self.first, text='نمودار و قیمت')
+        tabs.add(self.first, text='Chart and Table')
         self.second = ttk.Frame(tabs)
-        tabs.add(self.second, text='ارسال به دوستان')
+        tabs.add(self.second, text='Send to others')
         tabs.pack(expand=1, fill="both")
 
         
@@ -48,16 +49,16 @@ class price:
 #############################################################################################
         frame = LabelFrame(self.first, text = 'select one of the checkboxes',bd=3,padx=20,pady=10)
         frame.place(x=20, y = 40)
-        Radiobutton(frame,text='دلار', variable=self.l,value= 'dollar', command=self.dollar_price).pack()
-        Radiobutton(frame, text='طلا', variable= self.l,value = 'gold', command = self.gold_price).pack()
-        Radiobutton(frame,text='بیتکوین', variable=self.l, value='bitcoin', command=self.bitcoin_price).pack()
-        Radiobutton(frame,text='سکه تمام', variable=self.l, value='coin',command = self.coin_gold_price).pack()
-        Radiobutton(frame,text='یورو', variable=self.l, value='euro', command =self.euro_price).pack()
-        Radiobutton(frame,text='بورس', variable=self.l, value = 'bors', command=self.bors_price).pack()
-        Radiobutton(frame,text='درهم امارات', variable=self.l, value = 'derham', command = self.derham_price).pack()
-        Radiobutton(frame,text='تتر', variable=self.l, value='tether', command=self.tether_price).pack()
-        Radiobutton(frame,text='دینار عراق', variable=self.l, value = 'divar', command=self.iqd_price).pack()
-        Radiobutton(frame,text='شستا', variable=self.l,value='shasta',command=self.shasta_price).pack()
+        Radiobutton(frame,text='Dollar', variable=self.l,value= 'dollar', command=self.dollar_price).pack()
+        Radiobutton(frame, text='Gold', variable= self.l,value = 'gold', command = self.gold_price).pack()
+        Radiobutton(frame,text='Bitcoin', variable=self.l, value='bitcoin', command=self.bitcoin_price).pack()
+        Radiobutton(frame,text='Gold Coin', variable=self.l, value='coin',command = self.coin_gold_price).pack()
+        Radiobutton(frame,text='Euro', variable=self.l, value='euro', command =self.euro_price).pack()
+        Radiobutton(frame,text='Bors', variable=self.l, value = 'bors', command=self.bors_price).pack()
+        Radiobutton(frame,text='Emirates Derham', variable=self.l, value = 'derham', command = self.derham_price).pack()
+        Radiobutton(frame,text='Tether', variable=self.l, value='tether', command=self.tether_price).pack()
+        Radiobutton(frame,text='Iraq Dinar', variable=self.l, value = 'divar', command=self.iqd_price).pack()
+        Radiobutton(frame,text='Shasta', variable=self.l,value='shasta',command=self.shasta_price).pack()
 #################################### Second page#################
 #        Int vars
         self.dollar = IntVar()
@@ -71,52 +72,63 @@ class price:
         self.iraq = IntVar()
         self.shasta = IntVar()
 #           Entries
-        frame2 = LabelFrame(self.second, text='مواردی که قصد ارسال دارید', bd = 3, padx=20, pady=20)
+        frame2 = LabelFrame(self.second, text='select what you want send', bd = 3, padx=20, pady=20)
         frame2.place(x=20, y =40)
-        Checkbutton(frame2, text='دلار',variable=self.dollar).pack()
-        Checkbutton(frame2, text='طلا 18',variable=self.gold).pack()
-        Checkbutton(frame2, text='بیتکوین',variable=self.bitcoin).pack()
-        Checkbutton(frame2, text='سکه تمام',variable=self.coin).pack()
-        Checkbutton(frame2, text='یورو',variable=self.euro).pack()
-        Checkbutton(frame2, text='شاخص بورس',variable=self.bors).pack()
-        Checkbutton(frame2, text='درهم امارات',variable=self.derham).pack()
-        Checkbutton(frame2, text='تتر',variable=self.tether).pack()
-        Checkbutton(frame2, text='دینار عراق',variable=self.iraq).pack()
-        Checkbutton(frame2, text='شستا',variable=self.shasta).pack()
+        Checkbutton(frame2, text='Dollar',variable=self.dollar).pack()
+        Checkbutton(frame2, text='Gold(18)',variable=self.gold).pack()
+        Checkbutton(frame2, text='Bitcoin',variable=self.bitcoin).pack()
+        Checkbutton(frame2, text='Gold Coin',variable=self.coin).pack()
+        Checkbutton(frame2, text='Euro',variable=self.euro).pack()
+        Checkbutton(frame2, text='Bors index',variable=self.bors).pack()
+        Checkbutton(frame2, text='Emirates Derham',variable=self.derham).pack()
+        Checkbutton(frame2, text='Tether',variable=self.tether).pack()
+        Checkbutton(frame2, text='Iraq Dinar',variable=self.iraq).pack()
+        Checkbutton(frame2, text='Shasta',variable=self.shasta).pack()
         
-        self.frame3 = LabelFrame(self.second, text = 'ارسال ایمیل', bd = 3, padx =20, pady=50)
+        self.frame3 = LabelFrame(self.second, text = 'Send Mail', bd = 3, padx =20, pady=50)
         self.frame3.place(x =250, y=40)
         self.email = StringVar()
-        la1 = Label(self.frame3, text = 'ایمیل').pack()
+        la1 = Label(self.frame3, text = 'Email').pack()
         self.email_sender = Entry(self.frame3, textvariable=self.email,width=30, bd=2)
         self.email_sender.pack()
-        la2 = Label(self.frame3, text='رمز عبور').pack()
+        la2 = Label(self.frame3, text='Password').pack()
         self.password = StringVar()
         self.password= Entry(self.frame3, textvariable=self.password,width=30, bd=2, show="*")
         self.password.pack()
         
         self.one_or_more= IntVar()
-        Radiobutton(self.frame3,text='ارسال به یک نفر', variable=self.one_or_more,value=1,command = self.add_entry).pack()
-        Radiobutton(self.frame3,text='ارسال به چند نفر', variable=self.one_or_more,value=0,command = self.delete_and_add).pack()
-        self.button_explore = Button(self.frame3,text = "انتخاب لیست", command = self.browseFiles)
+        Radiobutton(self.frame3,text='Send to One', variable=self.one_or_more,value=1,command = self.add_entry).pack()
+        Radiobutton(self.frame3,text='Send to more than One', variable=self.one_or_more,value=0,command = self.delete_and_add).pack()
+        self.button_explore = Button(self.frame3,text = "Select List", command = self.browseFiles)
         self.button_explore.pack()
-        label_in_frame=Label(self.frame3, text='دریافت کننده').pack()
+        label_in_frame=Label(self.frame3, text='Reciver').pack()
         self.entry_for_reciver = Entry(self.frame3,width=30, bd=2,state='readonly')
         self.entry_for_reciver.pack()
-        button_explore = Button(self.frame3,text = "ارسال", command = self.send_email).pack()
-        self.frame4 = LabelFrame(self.second, text = 'ارسال SMS', bd = 3, padx =20, pady=50)
+        button_explore = Button(self.frame3,text = "Send", command = self.send_email).pack()
+        self.frame4 = LabelFrame(self.second, text = 'Send SMS', bd = 3, padx =50, pady=50)
         self.frame4.place(x =550, y=40)    
-        Label(self.frame4, text='فایل تسکتی که دارای شماره تماس ها است را انتخاب کنید').pack()
-        self.button_explore2 = Button(self.frame4,text = "انتخاب لیست", command = self.browseFiles)
+        Label(self.frame4, text='Select your File').pack()
+        self.button_explore2 = Button(self.frame4,text = "Select ", command = self.browseFiles)
         self.button_explore2.pack()
-        button_explore = Button(self.frame4,text = "ارسال", command = self.send_with_phone).pack()
+        button_explore = Button(self.frame4,text = "Send", command = self.send_with_phone).pack()
 
 ##############################################################################################
         exit_page_1 = Button(self.first, text= 'Exit', command= self.root.destroy, width=20, bd =3).place(x = 30, y =400)
 
         self.root.title("Have the newest price")
+  #      self.lbl = Label(self.first, font = ('calibri', 20, 'bold'),background = 'green', foreground = 'white')
+   #     self.lbl.place(x=400,y=0)
+    #    threading.Thread(target=self.time).start()
+        
         self.root.mainloop()
         
+
+
+ #   def time(self):
+  #      string = strftime('%H:%M:%S ')
+  #      self.lbl.config(text = string)
+   #     self.lbl.after(1000, self.time)
+
 
     def send_with_phone(self):
         prices = []
@@ -381,7 +393,7 @@ class price:
             pass            
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
-        plt.ylabel('price (Rial)')
+        plt.ylabel('price (Dollar)')
         plt.savefig('data\\bitcoin.png', dpi=80 )
         image1 = Image.open(r"data\bitcoin.png")
         test = ImageTk.PhotoImage(image1)
@@ -606,7 +618,10 @@ class price:
         plt.savefig('data\\tether.png', dpi=80 )
         image1 = Image.open(r"data\tether.png")
         test = ImageTk.PhotoImage(image1)
-        self.label2.destroy()
+        try:
+            self.label2.destroy()
+        except Exception:
+            pass
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
@@ -741,7 +756,7 @@ class price:
             server.quit() 
     
         
-c = price()
+a = price()
 
 
 
