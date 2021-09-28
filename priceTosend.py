@@ -17,17 +17,21 @@ import threading
 import http.client
 import dataframe_image as dfi # for save data frame as png file
 from time import strftime
+from urllib.parse import urlencode
+import ghasedak
 
 class price:
-    
+    """ This class is for priceses you can see different update price every day"""    
     def __init__(self):
-############################################################################################        
+############################################################################################       
+        """ in this function we have defined our basic variables for setup the application like the tkinter 
+        and other variable cuz we need set up the application immidiately after running"""
         
         self.root = tkinter.Tk()
         self.root.geometry('900x500')
 
 
-        self.root.iconbitmap('C:/Users/ali/Desktop/Graphicloads-Colorful-Long-Shadow-Dollar.ico')
+        self.root.iconbitmap(r'data/icon.ico')
         self.l = IntVar()
         menu_bar = Menu(self.root)
         menu_bar2 = Menu(menu_bar, tearoff=0)
@@ -163,16 +167,54 @@ class price:
                 
                 
     def send_message_with_ghasedak(self,phone,msg):
+        prices = []
+        for i in msg:
+            if 'Gold' in i:
+                prices.append('قیمت طلا در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7])
+                
+            elif 'Dollor' in i:
+                prices.append('قیمت دلار در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7])
+                
+            elif 'Bitcoin' in i:
+                prices.append('قیمت بیتکوین در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7] + ' دلار')
+            elif 'Coin' in i:
+                prices.append('قیمت سکه طلا در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7] + ' ریال')
+            elif 'Euro' in i:
+                prices.append('قیمت یورو در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7] + ' ریال')
+            elif 'Bors' in i:
+                prices.append('شاخص بورس در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7] )
+            elif 'Derham' in i:
+                prices.append('قیمت درهم در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7] + ' ریال')
+                
+            elif 'Tether' in  i:
+                prices.append('قیمت تتر در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7] + ' دلار')
+            elif 'Dinar' in i:
+                prices.append('قیمت دینار در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7] + ' دلار')
+            elif 'shasta' in i:
+                prices.append('قیمت دینار در تاریخ ' + i.split()[4] + 'برابر است با ' + i.split()[7] + ' دلار')
+                
+        prices_str = ''
+        for i in prices:
+            prices_str += i + '\n'
+            
+        prices_eng = ''
+        for i in msg:
+            prices_eng += i + '\n'
+        
+        #sms = ghasedak.Ghasedak('02bb8697d495c8c10257bfd8083b1990e595f4b891677cfb85dd7dca121e7623')
+        #data = sms.send({ 'message': prices_str,  'receptor' : '09390462790',  'linenumber': '10008566' })
+        
         conn = http.client.HTTPSConnection("api.ghasedak.me")
-        payload = f"message={msg}&receptor={phone}&linenumber=10008566"
+        payload = f"message={prices_eng}&receptor={phone}&linenumber=10008566"
         headers = { 'content-type': "application/x-www-form-urlencoded",
                    'apikey': "02bb8697d495c8c10257bfd8083b1990e595f4b891677cfb85dd7dca121e7623",
                    'cache-control': "no-cache",}
         conn.request("POST", "/v2/sms/send/simple", payload, headers)
         res = conn.getresponse()
         data = res.read()
+        
         Label(self.frame4,text = data,fg='blue').pack()
-
+        
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++        
     def add_entry(self):
         self.entry_for_reciver.config(state='normal')
@@ -301,15 +343,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\gold.png', dpi=80 )
-        image1 = Image.open(r"data\gold.png")
+        plt.savefig('data/gold.png', dpi=80 )
+        image1 = Image.open(r"data/gold.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\gold_dataframe.png')
-        image2 = Image.open('data\\gold_dataframe.png')
+        dfi.export(data_frame,'data/gold_dataframe.png')
+        image2 = Image.open('data/gold_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -348,15 +390,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\dollar.png', dpi=80 )
-        image1 = Image.open(r"data\dollar.png")
+        plt.savefig('data/dollar.png', dpi=80 )
+        image1 = Image.open(r"data/dollar.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\dollar_dataframe.png')
-        image2 = Image.open('data\\dollar_dataframe.png')
+        dfi.export(data_frame,'data/dollar_dataframe.png')
+        image2 = Image.open('data/dollar_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -394,15 +436,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Dollar)')
-        plt.savefig('data\\bitcoin.png', dpi=80 )
-        image1 = Image.open(r"data\bitcoin.png")
+        plt.savefig('data/bitcoin.png', dpi=80 )
+        image1 = Image.open(r"data/bitcoin.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\bitcoin_dataframe.png')
-        image2 = Image.open('data\\bitcoin_dataframe.png')
+        dfi.export(data_frame,'data/bitcoin_dataframe.png')
+        image2 = Image.open('data/bitcoin_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -438,15 +480,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\coin.png', dpi=80 )
-        image1 = Image.open(r"data\coin.png")
+        plt.savefig('data/coin.png', dpi=80 )
+        image1 = Image.open(r"data/coin.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\coin_dataframe.png')
-        image2 = Image.open('data\\coin_dataframe.png')
+        dfi.export(data_frame,'data/coin_dataframe.png')
+        image2 = Image.open('data/coin_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -483,15 +525,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\euro.png', dpi=80 )
-        image1 = Image.open(r"data\euro.png")
+        plt.savefig('data/euro.png', dpi=80 )
+        image1 = Image.open(r"data/euro.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\euro_dataframe.png')
-        image2 = Image.open('data\\euro_dataframe.png')
+        dfi.export(data_frame,'data/euro_dataframe.png')
+        image2 = Image.open('data/euro_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -527,15 +569,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\bors.png', dpi=80 )
-        image1 = Image.open(r"data\bors.png")
+        plt.savefig('data/bors.png', dpi=80 )
+        image1 = Image.open(r"data/bors.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\bors_dataframe.png')
-        image2 = Image.open('data\\bors_dataframe.png')
+        dfi.export(data_frame,'data/bors_dataframe.png')
+        image2 = Image.open('data/bors_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -571,15 +613,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\derham.png', dpi=80 )
-        image1 = Image.open(r"data\derham.png")
+        plt.savefig('data/derham.png', dpi=80 )
+        image1 = Image.open(r"data/derham.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\bors_dataframe.png')
-        image2 = Image.open('data\\bors_dataframe.png')
+        dfi.export(data_frame,'data/bors_dataframe.png')
+        image2 = Image.open('data/bors_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -615,8 +657,8 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\tether.png', dpi=80 )
-        image1 = Image.open(r"data\tether.png")
+        plt.savefig('data/tether.png', dpi=80 )
+        image1 = Image.open(r"data/tether.png")
         test = ImageTk.PhotoImage(image1)
         try:
             self.label2.destroy()
@@ -626,8 +668,8 @@ class price:
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\bors_dataframe.png')
-        image2 = Image.open('data\\bors_dataframe.png')
+        dfi.export(data_frame,'data/bors_dataframe.png')
+        image2 = Image.open('data/bors_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -662,15 +704,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\iqd.png', dpi=80 )
-        image1 = Image.open(r"data\iqd.png")
+        plt.savefig('data/iqd.png', dpi=80 )
+        image1 = Image.open(r"data/iqd.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\iqr_dataframe.png')
-        image2 = Image.open('data\\iqr_dataframe.png')
+        dfi.export(data_frame,'data/iqr_dataframe.png')
+        image2 = Image.open('data/iqr_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -704,15 +746,15 @@ class price:
         plt.plot(dates[5::-1], price_int[5::-1])
         plt.xlabel('date')
         plt.ylabel('price (Rial)')
-        plt.savefig('data\\shasta.png', dpi=80 )
-        image1 = Image.open(r"data\shasta.png")
+        plt.savefig('data/shasta.png', dpi=80 )
+        image1 = Image.open(r"data/shasta.png")
         test = ImageTk.PhotoImage(image1)
         label1 = tkinter.Label(self.first, image=test)
         label1.image = test
         label1.place( x=400, y=40)
         ######################## tabel
-        dfi.export(data_frame,'data\\shasta_dataframe.png')
-        image2 = Image.open('data\\shasta_dataframe.png')
+        dfi.export(data_frame,'data/shasta_dataframe.png')
+        image2 = Image.open('data/shasta_dataframe.png')
         test2 = ImageTk.PhotoImage(image2)
         self.label2 = tkinter.Label(self.first,image=test2)
         self.label2.image=test2
@@ -755,7 +797,6 @@ class price:
         finally:
             server.quit() 
     
-        
 a = price()
 
 
