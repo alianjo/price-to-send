@@ -4,4 +4,4 @@
 ```python -m pip  install -r requirement.txt```
 ## then start it by:
 ```python priceTosend.py```
-![Record_2021_10_18_11_57_00_609](https://user-images.githubusercontent.com/69678339/137697095-6ac57fb6-1b6f-48a5-bbfb-33bf0dc498e0.gif)
+![Uploading Record_2021_10_18_14_39_58_189.gif…]()
