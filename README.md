@@ -5,4 +5,4 @@
 ## then start it by:
 ```python priceTosend.py```
 
-![Uploading Record_2021_10_18_14_39_58_189.gif…]()
+![Record_2021_10_18_14_39_58_189](https://user-images.githubusercontent.com/69678339/137720455-0f589806-04ac-4bd5-929b-2169c68ebb4f.gif)
