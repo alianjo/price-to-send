@@ -205,7 +205,7 @@ class price:
         #data = sms.send({ 'message': prices_str,  'receptor' : '09390462790',  'linenumber': '10008566' })
         
         conn = http.client.HTTPSConnection("api.ghasedak.me")
-        payload = f"message={prices_eng}&receptor={phone}&linenumber=10008566"
+        payload = f"message={prices_eng}&receptor={phone}&linenumber=50001212124823"
         headers = { 'content-type': "application/x-www-form-urlencoded",
                    'apikey': "02bb8697d495c8c10257bfd8083b1990e595f4b891677cfb85dd7dca121e7623",
                    'cache-control': "no-cache",}
