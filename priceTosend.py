@@ -201,13 +201,13 @@ class price:
         for i in msg:
             prices_eng += i + '\n'
         
-        #sms = ghasedak.Ghasedak('02bb8697d495c8c10257bfd8083b1990e595f4b891677cfb85dd7dca121e7623')
-        #data = sms.send({ 'message': prices_str,  'receptor' : '09390462790',  'linenumber': '10008566' })
+        #sms = ghasedak.Ghasedak(<api-key>)
+        #data = sms.send({ 'message': prices_str,  'receptor' : <your number>,  'linenumber': <line> })
         
         conn = http.client.HTTPSConnection("api.ghasedak.me")
-        payload = f"message={prices_eng}&receptor={phone}&linenumber=50001212124823"
+        payload = f"message={prices_eng}&receptor={phone}&linenumber=<line>"
         headers = { 'content-type': "application/x-www-form-urlencoded",
-                   'apikey': "02bb8697d495c8c10257bfd8083b1990e595f4b891677cfb85dd7dca121e7623",
+                   'apikey': "<api-key>",
                    'cache-control': "no-cache",}
         conn.request("POST", "/v2/sms/send/simple", payload, headers)
         res = conn.getresponse()
